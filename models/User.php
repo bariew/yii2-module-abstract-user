@@ -7,7 +7,7 @@
 
 namespace bariew\userAbstractModule\models;
 
-use bariew\abstractAbstractModule\models\AbstractModel;
+use bariew\abstractModule\models\AbstractModel;
 use yii\web\IdentityInterface;
 use Yii;
  

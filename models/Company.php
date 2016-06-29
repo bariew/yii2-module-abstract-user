@@ -7,7 +7,7 @@
 
 namespace bariew\userAbstractModule\models;
 
-use bariew\abstractAbstractModule\models\AbstractModel;
+use bariew\abstractModule\models\AbstractModel;
 use yii\base\Event;
 use yii\db\ActiveRecord;
 use Yii;

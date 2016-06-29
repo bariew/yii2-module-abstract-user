@@ -7,7 +7,7 @@
 
 namespace bariew\userAbstractModule\controllers;
 
-use bariew\abstractAbstractModule\controllers\AbstractModelController;
+use bariew\abstractModule\controllers\AbstractModelController;
 use Yii;
 use bariew\userAbstractModule\models\Company;
 use bariew\userAbstractModule\models\CompanySearch;
