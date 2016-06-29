@@ -11,7 +11,7 @@ Installation
 'modules' => [
     ...
     'user' => [
-        'class' => 'bariew\userAbstractModule\Module',
+        'class' => 'bariew\userAbstractModule\UserModule',
         'params' => [
             'emailConfirm' => false, // whether registration email confirm is required
             'resetTokenExpireSeconds' => 86400 // seconds till password reset token expires
