@@ -23,20 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
+            \bariew\yii2Tools\helpers\GridHelper::listFormat($searchModel, 'role'),
             'email:email',
             'username',
-            [
-                'attribute' => 'created_at',
-                'format' => 'datetime',
-                'filter' => yii\jui\DatePicker::widget([
-                    'model' => $searchModel, 
-                    'attribute' => 'created_at', 
-                    'dateFormat' => 'php:Y-m-d',
-                    'options' => ['class' => 'form-control']
-                ]),
-            ],
-            ['class' => 'yii\grid\ActionColumn'],
+            \bariew\yii2Tools\helpers\GridHelper::dateFormat($searchModel, 'created_at'),
+            ['class' => 'yii\grid\ActionColumn', 'options' => ['style' => 'width:70px']],
         ],
     ]); ?>
 

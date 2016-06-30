@@ -8,6 +8,7 @@
 namespace bariew\userAbstractModule\models;
 
 use bariew\abstractModule\models\AbstractModel;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 use Yii;
  
@@ -27,6 +28,7 @@ use Yii;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property string $role password
  *
  * @property Company $company
  */
@@ -64,6 +66,7 @@ class User extends AbstractModel implements IdentityInterface
             'owner_id'     => Yii::t('modules/user', 'Owner ID'),
             'auth_key'     => Yii::t('modules/user', 'Auth key'),
             'api_key'      => Yii::t('modules/user', 'Api key'),
+            'role'         => Yii::t('modules/user', 'Role'),
         ];
     }
 
@@ -77,6 +80,15 @@ class User extends AbstractModel implements IdentityInterface
             static::STATUS_INACTIVE => Yii::t('modules/user', 'Deactivated'),
             static::STATUS_ACTIVE   => Yii::t('modules/user', 'Active')
         ];
+    }
+
+    /**
+     * Available site user roles
+     * @return array
+     */
+    public function roleList()
+    {
+        return ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', 'name');
     }
 
     /**
@@ -104,6 +116,16 @@ class User extends AbstractModel implements IdentityInterface
     public function getStatusName()
     {
         return static::statusList()[$this->status];
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        return @reset($roles)->name;
     }
 
     /**

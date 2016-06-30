@@ -12,21 +12,23 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * For searchin users.
+ * For searching users.
  * 
- * 
- * @example
+ *
+ * @mixin User
  * @author Pavel Bariev <bariew@yandex.ru>
  */
 class UserSearch extends AbstractModelExtender
 {
+    public $role;
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at', 'email', 'password', 'username', 'owner_id'], 'safe'],
+            [['id', 'created_at', 'updated_at', 'email', 'password', 'username', 'owner_id', 'role'], 'safe'],
             [['status'], 'integer'],
         ];
     }
@@ -68,7 +70,9 @@ class UserSearch extends AbstractModelExtender
                 'like', 'DATE_FORMAT(FROM_UNIXTIME(updated_at), "%Y-%m-%d")', $this->updated_at
             ])
             ;
-
+        if ($this->role) {
+            $query->andWhere(['id' => \Yii::$app->authManager->getUserIdsByRole($this->role)]);
+        }
         return $dataProvider;
     }
 }
