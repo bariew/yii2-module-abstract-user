@@ -67,6 +67,10 @@ class User extends AbstractModel implements IdentityInterface
             'auth_key'     => Yii::t('modules/user', 'Auth key'),
             'api_key'      => Yii::t('modules/user', 'Api key'),
             'role'         => Yii::t('modules/user', 'Role'),
+            'created_at'   => Yii::t('modules/user', 'Created At'),
+            'updated_at'   => Yii::t('modules/user', 'Updated At'),
+            'status'       => Yii::t('modules/user', 'Status'),
+            'password'     => Yii::t('modules/user', 'Password'),
         ];
     }
 
