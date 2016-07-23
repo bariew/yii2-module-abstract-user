@@ -7,22 +7,23 @@
 
 namespace bariew\userAbstractModule\controllers;
 
+use bariew\abstractModule\controllers\AbstractModelController;
 use bariew\userAbstractModule\models\Auth;
-use bariew\userAbstractModule\models\LoginForm;
-use bariew\userAbstractModule\models\RegisterForm;
+use bariew\userAbstractModule\models\UserLoginForm;
+use bariew\userAbstractModule\models\UserRegisterForm;
+use bariew\userAbstractModule\models\UserRestoreForm;
 use yii\authclient\AuthAction;
-use yii\web\Controller;
 use bariew\userAbstractModule\models\User;
 use yii\authclient\BaseOAuth;
 use Yii;
- 
+
 /**
  * Default controller for all users.
  * 
  * 
  * @author Pavel Bariev <bariew@yandex.ru>
  */
-class DefaultController extends Controller
+class DefaultController extends AbstractModelController
 {
     /**
      * Url for redirecting after login
@@ -53,7 +54,9 @@ class DefaultController extends Controller
     public function authCallback(BaseOAuth $client)
     {
         $user = Auth::clientUser($client);
-        (new LoginForm($user->attributes))->login(false);
+        /** @var UserLoginForm $model */
+        $model = static::getModelClass('UserLoginForm', $user->attributes);
+        $model->login(false);
     }
 
     /**
@@ -67,7 +70,9 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->isGuest) {
             $this->redirect($this->getLoginRedirect()) && Yii::$app->end();
         }
-        $model = new LoginForm();
+
+        /** @var UserLoginForm $model */
+        $model = static::getModelClass('UserLoginForm', []);
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             $this->redirect($this->getLoginRedirect()) && Yii::$app->end();
         }
@@ -97,8 +102,8 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->isGuest) {
             $this->goHome() && Yii::$app->end();
         }
-
-        $model = new RegisterForm();
+        /** @var UserRegisterForm $model */
+        $model = static::getModelClass('UserRegisterForm', []);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash("success", Yii::$app->user->isGuest
                 ? Yii::t('modules/user', 'Please confirm registration email!')
@@ -125,7 +130,7 @@ class DefaultController extends Controller
          */
         if ($auth_key && ($user = $model::findOne(compact('auth_key')))) {
             Yii::$app->session->setFlash("success", Yii::t('modules/user',
-                "You have successfully completed your registration. Please set your password."));
+                "You have successfully completed your registration."));
             Yii::$app->user->login($user);
             $user->activate();
         }else{
@@ -133,6 +138,34 @@ class DefaultController extends Controller
             $this->goHome() && Yii::$app->end();
         }
         $this->redirect(['update']);
+    }
+
+
+    /**
+     * For registration confirmation by email auth link.
+     * @param string|bool $token user authorization key.
+     * @return string view.
+     */
+    public function actionRestore($token = false)
+    {
+        $user = $this->findModel(true);
+        if ($restoredUser = $user::findByPasswordResetToken($token)) {
+            Yii::$app->user->login($restoredUser);
+            Yii::$app->session->setFlash("success", Yii::t('modules/user', "You can change your password now."));
+            $this->redirect(['update']) && Yii::$app->end();
+        } else if ($token) {
+            Yii::$app->session->setFlash("error", Yii::t('modules/user', "Token is invalid."));
+            $this->goHome() && Yii::$app->end();
+        }
+
+        /** @var UserRestoreForm $model */
+        $model = static::getModelClass('UserRestoreForm', []);
+
+        if ($model->load(Yii::$app->request->post()) && $model->send()) {
+            Yii::$app->session->setFlash("success", Yii::t('modules/user', "Password reset link has been sent to your email."));
+            $this->goHome() && Yii::$app->end();
+        }
+        return $this->render('restore', compact('model'));
     }
     
     /**
@@ -155,15 +188,16 @@ class DefaultController extends Controller
             ]);
         }
     }
-    
+
     /**
      * Finds user model.
-     * @param boolean $new
+     * @param bool $id // if true will return new User
+     * @param bool $search
      * @return User
      */
-    public function findModel($new = false)
+    public function findModel($id = false, $search = false)
     {
         $class = \Yii::$app->user->identityClass;
-        return $new === true ? new $class() : Yii::$app->user->identity;
+        return $id === false ? Yii::$app->user->identity : new $class();
     }
 }

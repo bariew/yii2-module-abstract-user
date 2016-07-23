@@ -6,6 +6,7 @@
  */
 
 namespace bariew\userAbstractModule;
+use bariew\abstractModule\AbstractModule;
 use Yii;
 use yii\web\Application;
 
@@ -16,7 +17,7 @@ use yii\web\Application;
  * @author Pavel Bariev <bariew@yandex.ru>
  *
  */
-class UserModule extends \yii\base\Module
+class UserModule extends AbstractModule
 {
     public $params = [
         'emailConfirm' => false,

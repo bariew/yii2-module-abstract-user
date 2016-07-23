@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 /**
  * @var yii\web\View $this
  * @var yii\widgets\ActiveForm $form
- * @var bariew\userAbstractModule\models\LoginForm $model
+ * @var bariew\userAbstractModule\models\UserLoginForm $model
  */
 $this->title = Yii::t('modules/user', 'Login');
 $this->params['breadcrumbs'][] = $this->title;
@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?php echo $form->field($model, $model->loginAttribute) ?>
+    <?php echo $form->field($model, $model::$loginAttribute) ?>
 
     <?php echo $form->field($model, 'password')->passwordInput() ?>
 

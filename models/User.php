@@ -29,6 +29,7 @@ use Yii;
  * @property integer $updated_at
  * @property string $password write-only password
  * @property string $role password
+ * @property string $password_reset_token
  *
  * @property Company $company
  */
@@ -44,14 +45,13 @@ class User extends AbstractModel implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => static::STATUS_ACTIVE],
-            ['owner_id', 'safe', 'when' => function($model){ return !$model->owner_id;}],
-            ['username', 'filter', 'filter' => 'trim'],
-            [[static::$loginAttribute, 'password'], 'required'],
-            [['email', 'username', 'api_key'], 'unique'],
-            [['username', 'password'], 'string', 'min' => 2, 'max' => 255],
-            ['email', 'filter', 'filter' => 'trim'],
             ['email', 'email'],
+            [['username', 'password'], 'string', 'min' => 2, 'max' => 255],
+            'status' => ['status', 'default', 'value' => static::STATUS_ACTIVE],
+            ['owner_id', 'safe', 'when' => function($model){ return !$model->owner_id;}],
+            [['username', 'email'], 'filter', 'filter' => 'trim'],
+            [[static::$loginAttribute, 'password'], 'required'],
+            [[static::$loginAttribute, 'api_key'], 'unique'],
         ];
     }
 
@@ -138,10 +138,7 @@ class User extends AbstractModel implements IdentityInterface
      */
     public function activate()
     {
-        return $this->updateAttributes([
-            'status' => static::STATUS_ACTIVE,
-            'auth_key' => null
-        ]);
+        return $this->updateAttributes(['status' => static::STATUS_ACTIVE]);
     }
     
     /**
@@ -209,10 +206,7 @@ class User extends AbstractModel implements IdentityInterface
             return null;
         }
 
-        return static::findOne([
-            'password_reset_token' => $token,
-            'status'               => static::STATUS_ACTIVE,
-        ]);
+        return static::findOne(['password_reset_token' => $token]);
     }
 
     /**
@@ -280,14 +274,6 @@ class User extends AbstractModel implements IdentityInterface
     public function generatePasswordResetToken()
     {
         $this->password_reset_token = md5(Yii::$app->security->generateRandomKey()) . '_' . time();
-    }
-
-    /**
-     * Removes password reset token
-     */
-    public function removePasswordResetToken()
-    {
-        $this->password_reset_token = null;
     }
 
     /**

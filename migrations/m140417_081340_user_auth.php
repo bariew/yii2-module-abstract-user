@@ -4,7 +4,7 @@ use yii\db\Schema;
 use yii\db\Migration;
 use bariew\userAbstractModule\models\Auth;
 
-class m150407_062517_user_auth extends Migration
+class m140417_081340_user_auth extends Migration
 {
     public function up()
     {
