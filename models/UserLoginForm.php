@@ -90,7 +90,8 @@ class UserLoginForm extends AbstractModelExtender
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = static::findByLogin($this->attributes);
+            $parentClass = get_parent_class();
+            $this->_user = $parentClass::findByLogin($this->attributes);
         }
 
         return $this->_user;

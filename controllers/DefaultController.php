@@ -70,7 +70,6 @@ class DefaultController extends AbstractModelController
         if (!\Yii::$app->user->isGuest) {
             $this->redirect($this->getLoginRedirect()) && Yii::$app->end();
         }
-
         /** @var UserLoginForm $model */
         $model = static::getModelClass('UserLoginForm', []);
         if ($model->load(Yii::$app->request->post()) && $model->login()) {

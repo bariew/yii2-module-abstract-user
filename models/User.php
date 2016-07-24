@@ -184,10 +184,7 @@ class User extends AbstractModel implements IdentityInterface
      */
     public static function findByLogin($login)
     {
-        return static::findOne([
-            static::$loginAttribute => $login,
-            'status' => static::STATUS_ACTIVE
-        ]);
+        return static::findOne([static::$loginAttribute => $login]);
     }
 
     /**
