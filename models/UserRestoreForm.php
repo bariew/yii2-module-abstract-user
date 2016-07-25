@@ -30,6 +30,7 @@ class UserRestoreForm extends AbstractModelExtender
     public function rules()
     {
         return [
+            ['email', 'required'],
             ['email', 'email'],
         ];
     }
