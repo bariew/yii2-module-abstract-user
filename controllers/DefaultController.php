@@ -111,9 +111,9 @@ class DefaultController extends AbstractModelController
             (($url = $this->getLoginRedirect()) && !Yii::$app->user->isGuest)
                 ? $this->redirect($url) 
                 : $this->goBack();
-            Yii::$app->end();
+        } else {
+            return $this->render('register', compact('model'));
         }
-        return $this->render('register', compact('model'));
     }
     
     /**
