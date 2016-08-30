@@ -108,12 +108,13 @@ class DefaultController extends AbstractModelController
                 ? Yii::t('modules/user', 'Please confirm registration email!')
                 : Yii::t('modules/user', 'Registration completed!')
             );
-            (($url = $this->getLoginRedirect()) && !Yii::$app->user->isGuest)
-                ? $this->redirect($url) 
-                : $this->goBack();
-            Yii::$app->end();
         }
-        return $this->render('register', compact('model'));
+        if (($url = $this->getLoginRedirect()) && !Yii::$app->user->isGuest) {
+            $this->redirect($url) && Yii::$app->end();
+        }
+
+        $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
+        return $this->$render('register', compact('model'));
     }
     
     /**
@@ -164,7 +165,8 @@ class DefaultController extends AbstractModelController
             Yii::$app->session->setFlash("success", Yii::t('modules/user', "Password reset link has been sent to your email."));
             $this->goHome() && Yii::$app->end();
         }
-        return $this->render('restore', compact('model'));
+        $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
+        return $this->$render('restore', compact('model'));
     }
     
     /**
