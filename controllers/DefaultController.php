@@ -67,18 +67,17 @@ class DefaultController extends AbstractModelController
      */
     public function actionLogin($view = 'login', $partial = false)
     {
-        if (!\Yii::$app->user->isGuest) {
-            $this->redirect($this->getLoginRedirect()) && Yii::$app->end();
-        }
         /** @var UserLoginForm $model */
         $model = static::getModelClass('UserLoginForm', []);
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            $this->redirect($this->getLoginRedirect()) && Yii::$app->end();
-        }
-        if (\Yii::$app->request->isAjax || $partial) {
+        if (!\Yii::$app->user->isGuest) {
+            $this->redirect($this->getLoginRedirect());
+        } else if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            $this->redirect($this->getLoginRedirect());
+        }else if (\Yii::$app->request->isAjax || $partial) {
             return $this->renderAjax($view, compact('model'));
+        } else {
+            return $this->render($view, compact('model'));
         }
-        return $this->render($view, compact('model'));
     }
 
     /**
@@ -88,8 +87,7 @@ class DefaultController extends AbstractModelController
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
-        $this->goHome() && Yii::$app->end();
+        $this->goHome();
     }
     
     /**
@@ -99,7 +97,7 @@ class DefaultController extends AbstractModelController
     public function actionRegister()
     {
         if (!\Yii::$app->user->isGuest) {
-            $this->goHome() && Yii::$app->end();
+            $this->goHome();
         }
         /** @var UserRegisterForm $model */
         $model = static::getModelClass('UserRegisterForm', []);
@@ -110,11 +108,11 @@ class DefaultController extends AbstractModelController
             );
         }
         if (($url = $this->getLoginRedirect()) && !Yii::$app->user->isGuest) {
-            $this->redirect($url) && Yii::$app->end();
+            $this->redirect($url);
+        } else {
+            $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
+            return $this->$render('register', compact('model'));
         }
-
-        $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
-        return $this->$render('register', compact('model'));
     }
     
     /**
@@ -133,11 +131,11 @@ class DefaultController extends AbstractModelController
                 "You have successfully completed your registration."));
             Yii::$app->user->login($user);
             $user->activate();
+            $this->redirect(['update']);
         }else{
             Yii::$app->session->setFlash("error", Yii::t('modules/user', "Your auth link is invalid."));
-            $this->goHome() && Yii::$app->end();
+            $this->goHome();
         }
-        $this->redirect(['update']);
     }
 
 
@@ -149,24 +147,22 @@ class DefaultController extends AbstractModelController
     public function actionRestore($token = false)
     {
         $user = $this->findModel(true);
+        /** @var UserRestoreForm $model */
+        $model = static::getModelClass('UserRestoreForm', []);
         if ($restoredUser = $user::findByPasswordResetToken($token)) {
             Yii::$app->user->login($restoredUser);
             Yii::$app->session->setFlash("success", Yii::t('modules/user', "You can change your password now."));
-            $this->redirect(['update']) && Yii::$app->end();
+            $this->redirect(['update']);
         } else if ($token) {
             Yii::$app->session->setFlash("error", Yii::t('modules/user', "Token is invalid."));
-            $this->goHome() && Yii::$app->end();
-        }
-
-        /** @var UserRestoreForm $model */
-        $model = static::getModelClass('UserRestoreForm', []);
-
-        if ($model->load(Yii::$app->request->post()) && $model->send()) {
+            $this->goHome();
+        } else if ($model->load(Yii::$app->request->post()) && $model->send()) {
             Yii::$app->session->setFlash("success", Yii::t('modules/user', "Password reset link has been sent to your email."));
-            $this->goHome() && Yii::$app->end();
+            $this->goHome();
+        } else {
+            $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
+            return $this->$render('restore', compact('model'));
         }
-        $render = Yii::$app->request->isAjax ? 'renderAjax' : 'render';
-        return $this->$render('restore', compact('model'));
     }
     
     /**
@@ -178,15 +174,12 @@ class DefaultController extends AbstractModelController
     {
         if (!$model = $this->findModel()) {
             Yii::$app->session->setFlash("error", Yii::t('modules/user', "You are not logged in."));
-            $this->goHome() && Yii::$app->end();
-        }
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->goHome();
+        } else if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash("success", Yii::t('modules/user', "Changes has been saved."));
-            $this->refresh() && Yii::$app->end();
+            $this->refresh();
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            return $this->render('update', ['model' => $model,]);
         }
     }
 
