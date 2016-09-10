@@ -131,7 +131,7 @@ class DefaultController extends AbstractModelController
                 "You have successfully completed your registration."));
             Yii::$app->user->login($user);
             $user->activate();
-            $this->redirect(['update']);
+            $this->redirect($this->getLoginRedirect());
         }else{
             Yii::$app->session->setFlash("error", Yii::t('modules/user', "Your auth link is invalid."));
             $this->goHome();
@@ -152,7 +152,7 @@ class DefaultController extends AbstractModelController
         if ($restoredUser = $user::findByPasswordResetToken($token)) {
             Yii::$app->user->login($restoredUser);
             Yii::$app->session->setFlash("success", Yii::t('modules/user', "You can change your password now."));
-            $this->redirect(['update']);
+            $this->redirect($this->getLoginRedirect());
         } else if ($token) {
             Yii::$app->session->setFlash("error", Yii::t('modules/user', "Token is invalid."));
             $this->goHome();
