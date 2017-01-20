@@ -68,9 +68,7 @@ class Company extends AbstractModel
     {
         /** @var ActiveRecord $model */
         $model = $event->sender;
-        if (!$model->hasAttribute('owner_id') || $model->getAttribute('owner_id')
-            || !isset(Yii::$app->user)
-        ) {
+        if (!$model->hasAttribute('owner_id') || $model->getAttribute('owner_id') || !isset(Yii::$app->user)) {
             return;
         }
         $model->setAttribute('owner_id', @Yii::$app->user->getIdentity()->owner_id);

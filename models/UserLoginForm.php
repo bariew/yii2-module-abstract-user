@@ -16,14 +16,12 @@ use Yii;
  * 
  * @author Pavel Bariev <bariew@yandex.ru>
  *
- * @property string $loginAttribute
- *
  * @mixin User
  */
 class UserLoginForm extends AbstractModelExtender
 {
     public $rememberMe = true;
-
+    /** @var User */
     protected $_user = false;
 
     /**
@@ -56,13 +54,14 @@ class UserLoginForm extends AbstractModelExtender
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
+     * @param $attribute
      */
     public function validatePassword($attribute)
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
-            if (!$user || !$user->validatePassword($this->password)) {
+            if (!$user || !$user->validatePassword($this->{$attribute})) {
                 $this->addError('password', 'Incorrect username or password.');
             }
         }
@@ -75,11 +74,13 @@ class UserLoginForm extends AbstractModelExtender
      */
     public function login($validate = true)
     {
-        if (!$validate || $this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
-        } else {
+        if ($validate && !$this->validate()) {
             return false;
         }
+        $returnUrl = Yii::$app->user->returnUrl;
+        $result = Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+        Yii::$app->user->returnUrl = $returnUrl;
+        return $result;
     }
 
     /**
@@ -90,6 +91,7 @@ class UserLoginForm extends AbstractModelExtender
     public function getUser()
     {
         if ($this->_user === false) {
+            /** @var static $parentClass */
             $parentClass = get_parent_class();
             $this->_user = $parentClass::findByLogin($this->attributes);
         }
