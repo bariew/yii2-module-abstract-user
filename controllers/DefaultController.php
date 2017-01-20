@@ -97,7 +97,7 @@ class DefaultController extends AbstractModelController
     public function actionRegister()
     {
         if (!\Yii::$app->user->isGuest) {
-            $this->goHome();
+            return $this->goHome();
         }
         /** @var UserRegisterForm $model */
         $model = static::getModelClass('UserRegisterForm', []);

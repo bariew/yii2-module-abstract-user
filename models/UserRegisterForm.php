@@ -38,6 +38,16 @@ class UserRegisterForm extends AbstractModelExtender
     /**
      * @inheritdoc
      */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'password_repeat' => \Yii::t('modules/user', 'Repeat Password'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
