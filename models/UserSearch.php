@@ -43,6 +43,16 @@ class UserSearch extends AbstractModelExtender
     }
 
     /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'role' => \Yii::t('modules/user', 'Role'),
+        ]);
+    }
+
+    /**
      * Searches users.
      * @param array $params search query data
      * @return ActiveDataProvider
